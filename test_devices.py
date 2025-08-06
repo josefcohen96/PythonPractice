@@ -12,8 +12,8 @@ of good testing practices.
 
 import pytest
 
-from .devices import SignalGenerator, SpectrumAnalyzer
-from .exceptions import RangeError, InstrumentError
+from devices import SignalGenerator, SpectrumAnalyzer
+from exceptions import RangeError, InstrumentError
 
 
 @pytest.fixture
