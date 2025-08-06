@@ -6,13 +6,17 @@ communicating with laboratory instruments.  Each instrument implements
 that connections are properly opened and closed even when exceptions are
 raised.  They also use properties to expose settings in a Pythonic way.
 """
-
 from __future__ import annotations
-
+import sys
+import os
 import random
 from typing import Optional
 
-from exceptions import InstrumentError, ConnectionError, RangeError
+# Add the project root directory to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
+from main.exceptions import InstrumentError, ConnectionError, RangeError
 
 
 class SignalGenerator:

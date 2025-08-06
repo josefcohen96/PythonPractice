@@ -7,9 +7,15 @@ with a spectrum analyzer, and then disables the output.  The printed output
 illustrates the sequence of operations and the effect of simulated measurement
 noise.
 """
+import sys
+import os
+
+# Add the project root directory to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 from __future__ import annotations
-from devices import SignalGenerator, SpectrumAnalyzer
+from main.devices import SignalGenerator, SpectrumAnalyzer
 
 
 def main() -> None:
