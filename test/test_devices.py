@@ -11,9 +11,15 @@ of good testing practices.
 """
 
 import pytest
+import sys
+import os
 
-from devices import SignalGenerator, SpectrumAnalyzer
-from exceptions import RangeError, InstrumentError
+# Add the project root directory to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
+from main.devices import SignalGenerator, SpectrumAnalyzer
+from main.exceptions import RangeError, InstrumentError
 
 
 @pytest.fixture
