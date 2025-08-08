@@ -15,7 +15,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 from __future__ import annotations
-from main.devices import SignalGenerator, SpectrumAnalyzer
+from devices.devices import SignalGenerator, SpectrumAnalyzer
 
 
 def main() -> None:

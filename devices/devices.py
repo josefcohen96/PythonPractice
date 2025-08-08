@@ -16,7 +16,7 @@ from typing import Optional
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from main.exceptions import InstrumentError, ConnectionError, RangeError
+from core.exceptions import InstrumentError, ConnectionError, RangeError
 
 
 class SignalGenerator:
@@ -171,26 +171,29 @@ class Oven:
         if not connection:
             return "unable to connect"
 
-        self.connection = connection
+        self._connection = connection
 
     @property
     def temp(self) -> Optional[float]:
         return self._temp
 
     @temp.setter
-    def temp(self, value:float, *args, **kwargs):
+    def temp(self, value:float):
+        if not self._connection:
+            return  ConnectionError("oven is not connected")
         if value < self.minTemp or value > self.maxTemp:
             raise RangeError(f"value: {value} is not in range, range is: [{self.minTemp}, {self.maxTemp}]")
 
         self._temp = value # send a SCPI command
 
     def __enter__(self) -> Oven:
-        self.connect = True
+        self._connection = True
         print(f"should create instance for connection")
         return self
     
-    def __exit__(self):
+    def __exit__(self, exec_stype, exec_):
         """If connection lost will close comm"""
-        print(f"should close connection")
-        return self
+        if self._connection: 
+            self._connection = False
+            print(f"should close connection")
 

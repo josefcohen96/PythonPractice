@@ -1,0 +1,11 @@
+- vendor: RIGOL
+  model_id: RIGOL-DP832
+  description: 3-channel programmable bench power supply
+  capabilities_ref: RIGOL-DP832
+  ranges_ref: RIGOL-DP832
+
+- vendor: KEITHLEY
+  model_id: KEITHLEY-2230G
+  description: Triple-channel programmable power supply
+  capabilities_ref: KEITHLEY-2230G
+  ranges_ref: KEITHLEY-2230G

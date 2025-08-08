@@ -1,0 +1,13 @@
+RIGOL-DP832:
+  set_voltage: true
+  set_current_limit: true
+  toggle_output: true
+  power_cycle: false
+  read_temp: false
+
+KEITHLEY-2230G:
+  set_voltage: true
+  set_current_limit: true
+  toggle_output: true
+  power_cycle: true
+  read_temp: true

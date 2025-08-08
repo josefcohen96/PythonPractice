@@ -10,7 +10,7 @@ pytest is not installed.  It is provided for completeness and as an example
 of good testing practices.
 """
 
-import pytest
+import pytest 
 import sys
 import os
 
@@ -18,8 +18,8 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from main.devices import SignalGenerator, SpectrumAnalyzer
-from main.exceptions import RangeError, InstrumentError
+from devices.devices import SignalGenerator, SpectrumAnalyzer
+from core.exceptions import RangeError, InstrumentError
 
 
 @pytest.fixture

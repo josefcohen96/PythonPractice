@@ -1,0 +1,19 @@
+RIGOL-DP832:
+  voltage:
+    min: 0
+    max: 30
+    unit: V
+  current:
+    min: 0
+    max: 3
+    unit: A
+
+KEITHLEY-2230G:
+  voltage:
+    min: 0
+    max: 32
+    unit: V
+  current:
+    min: 0
+    max: 5
+    unit: A
