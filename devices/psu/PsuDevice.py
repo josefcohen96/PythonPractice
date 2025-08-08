@@ -13,7 +13,7 @@ class PSU(BaseDevice):
 
     def __init__(self, model: str, adapter: Any, config_loader: Any) -> None:
 
-        self._listActions = ["voltage", "current", "temp", "output"]
+        self._listActions = ["voltage", "current", "temp"]
         if adapter is None:
             raise ValueError("adapter is required")
         if not model:
