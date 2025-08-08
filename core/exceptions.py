@@ -5,6 +5,7 @@ handle specific errors raised by instrument classes without relying on
 built‑in exceptions.  This improves the clarity of error handling code.
 """
 
+
 class InstrumentError(Exception):
     """Base class for instrument‑related errors."""
     pass
@@ -17,4 +18,9 @@ class ConnectionError(InstrumentError):
 
 class RangeError(InstrumentError):
     """Raised when a value is outside the allowable range for an instrument."""
+    pass
+
+
+class ValueError(InstrumentError):
+    """"""
     pass
