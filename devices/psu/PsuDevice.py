@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional, Union
 from ..base import BaseDevice, AdapterProtocol, ConfigLoaderProtocol
 from .strategy import (
     PsuStrategy,
@@ -8,7 +8,7 @@ from .strategy import (
 
 
 class PSU(BaseDevice):
-    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, *, strategy: PsuStrategy | None = None) -> None:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, *, strategy: Optional[PsuStrategy] = None) -> None:
         self._listActions = ["voltage", "current", "temp", "output"]
 
         if adapter is None:
@@ -42,7 +42,7 @@ class PSU(BaseDevice):
     def get_capabilities(self) -> Dict[str, bool]:
         return self._capabilities
 
-    def read(self, key: str) -> float | bool:
+    def read(self, key: str) -> Union[float, bool]:
         self.require_connected()
         if key not in self._listActions:
             raise KeyError(f"unable to read {key}; allowed: {self._listActions}")

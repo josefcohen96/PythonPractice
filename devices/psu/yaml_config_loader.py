@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 import yaml
 
 from .loader.config_loader import PSUConfigLoader
@@ -16,9 +16,10 @@ class YamlPSUConfigLoader(PSUConfigLoader):
       - models.yml
     """
 
-    def __init__(self, base_dir: str | Path | None = None) -> None:
+    def __init__(self, base_dir: Optional[Union[str, Path]] = None) -> None:
         if base_dir is None:
-            base_dir = Path(__file__).resolve().parent
+            # default to devices/psu/config directory
+            base_dir = Path(__file__).resolve().parent / "config"
         self.base = Path(base_dir)
         self._cap = {}
         self._ranges = {}
@@ -56,7 +57,7 @@ class YamlPSUConfigLoader(PSUConfigLoader):
         # Coerce values to bool
         return {k: bool(v) for k, v in caps.items()}
 
-    def load_ranges(self, model: str) -> Dict[str, float | str]:
+    def load_ranges(self, model: str) -> Dict[str, Union[float, str]]:
         try:
             rng = self._ranges[model]
         except KeyError as exc:

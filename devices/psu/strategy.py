@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Callable
+from typing import Dict, Optional, Callable, Union
 
 # Operation delays (seconds)
 SET_VOLTAGE_DELAY_S = 0.1
@@ -31,7 +31,7 @@ class PsuStrategy(ABC):
         ...
 
     @abstractmethod
-    def read(self, key: str) -> float | bool:
+    def read(self, key: str) -> Union[float, bool]:
         ...
 
     @abstractmethod
@@ -54,7 +54,7 @@ class PsuStrategy(ABC):
 class PSUContext:
     """Context shared with strategies (no strong coupling to BaseDevice)."""
 
-    def __init__(self, *, capabilities: Dict[str, bool], ranges: Dict[str, Dict[str, float | str]]) -> None:
+    def __init__(self, *, capabilities: Dict[str, bool], ranges: Dict[str, Dict[str, Union[float, str]]]) -> None:
         self.capabilities = capabilities
         self.ranges = ranges
 
@@ -81,7 +81,7 @@ class VirtualPsuStrategy(PsuStrategy):
         except Exception:
             return True
 
-    def read(self, key: str) -> float | bool:
+    def read(self, key: str) -> Union[float, bool]:
         if key == "voltage":
             # If output on, assume measured voltage approaches setpoint
             noise = random.uniform(-0.01, 0.01)
@@ -131,7 +131,7 @@ class RealPsuStrategy(PsuStrategy):
     This keeps the API stable while allowing real IO integration later.
     """
 
-    def __init__(self, *, write: Callable[[str], None] | None = None, read: Callable[[str], str] | None = None) -> None:
+    def __init__(self, *, write: Optional[Callable[[str], None]] = None, read: Optional[Callable[[str], str]] = None) -> None:
         super().__init__()
         self._write = write  # optional callables for instrument IO
         self._read = read
@@ -145,7 +145,7 @@ class RealPsuStrategy(PsuStrategy):
         # If we had IO, we could query IDN?, reset, etc.
         self._mirror.initialize()
 
-    def read(self, key: str) -> float | bool:
+    def read(self, key: str) -> Union[float, bool]:
         # If real IO available, map reads to SCPI (e.g., MEAS:VOLT?)
         # For now, fallback to mirror
         return self._mirror.read(key)
