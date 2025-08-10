@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..core.exceptions import ConnectionError
+from core.exceptions import ConnectionError
 from devices.psu.adapters.sim_adapter import SimAdapter
 from devices.psu.yaml_config_loader import YamlPSUConfigLoader
 from devices.psu.strategy import VirtualPsuStrategy
