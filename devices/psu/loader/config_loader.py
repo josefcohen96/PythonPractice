@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Dict
+
 
 class PSUConfigLoader(ABC):
     """
@@ -20,6 +21,7 @@ class PSUConfigLoader(ABC):
     All methods take the PSU model name as input and return the
     corresponding configuration data in a structured form.
     """
+
     @abstractmethod
     def load_capabilities(self, model: str) -> Dict[str, bool]:
         """Return a dictionary of capability flags for the given model."""
@@ -31,6 +33,6 @@ class PSUConfigLoader(ABC):
         pass
 
     @abstractmethod
-    def load_model_info(self, model: str) -> Dict[str, Any]:
+    def load_model_info(self, model: str) -> Dict[str, object]:
         """Return general metadata about the given PSU model."""
         pass

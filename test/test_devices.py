@@ -10,15 +10,10 @@ pytest is not installed.  It is provided for completeness and as an example
 of good testing practices.
 """
 
-import pytest 
-import sys
-import os
+import pytest
 
-# Add the project root directory to the Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
-from devices.devices import SignalGenerator, SpectrumAnalyzer
+from devices.signal_generator import SignalGenerator
+from devices.spectrum_analyzer import SpectrumAnalyzer
 from core.exceptions import RangeError, InstrumentError
 
 

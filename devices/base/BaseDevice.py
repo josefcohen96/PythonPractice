@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-from typing import Protocol, Any, Dict
+from typing import Protocol, Dict
 
 from core.exceptions import ConnectionError
 
@@ -14,7 +14,7 @@ class AdapterProtocol(Protocol):
 
 class ConfigLoaderProtocol(Protocol):
     def load_capabilities(self, model: str) -> Dict[str, bool]: ...
-    def load_ranges(self, model: str) -> Dict[str, Any]: ...
+    def load_ranges(self, model: str) -> Dict[str, Dict[str, float | str]]: ...
 
 
 class DeviceState(Enum):
@@ -26,6 +26,13 @@ class DeviceState(Enum):
 
 
 class BaseDevice(ABC):
+    """Base class for devices providing connection lifecycle management.
+
+    Override notes:
+    - Subclasses must implement get_state, get_capabilities, read, set.
+    - Do not override connect/disconnect unless you must extend behavior;
+      if you do, call super().connect()/disconnect() to preserve state.
+    """
     def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol) -> None:
         self.model = model
         self.adapter = adapter
@@ -75,9 +82,9 @@ class BaseDevice(ABC):
         ...
 
     @abstractmethod
-    def read(self, key: str) -> None:
+    def read(self, key: str) -> object:
         ...
 
     @abstractmethod
-    def set(self, key: str, value: Any) -> Any:
+    def set(self, key: str, value: object) -> None:
         ...

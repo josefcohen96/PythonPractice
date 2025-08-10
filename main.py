@@ -1,21 +1,11 @@
-"""Demonstration script for the signal_lab project.
+"""Demonstration script for the instruments.
 
-This script shows how to use the instrument classes defined in `devices.py`
-using context managers to ensure clean resource management.  It sets a
-frequency on a signal generator, enables its output, measures the frequency
-with a spectrum analyzer, and then disables the output.  The printed output
-illustrates the sequence of operations and the effect of simulated measurement
-noise.
+Runs a simple demo using the split device modules.
 """
-import sys
-import os
-
-# Add the project root directory to the Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
 from __future__ import annotations
-from devices.devices import SignalGenerator, SpectrumAnalyzer
+
+from devices.signal_generator import SignalGenerator
+from devices.spectrum_analyzer import SpectrumAnalyzer
 
 
 def main() -> None:

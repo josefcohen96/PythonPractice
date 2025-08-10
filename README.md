@@ -12,12 +12,20 @@ tests to show how you might validate your code using `pytest`.
 ## Structure
 
 ```
-signal_lab/
-├── devices.py       # Instrument classes (SignalGenerator, SpectrumAnalyzer)
-├── exceptions.py    # Custom exception classes
-├── main.py          # Example script that uses the instruments together
-├── test_devices.py  # Example tests written with pytest
-└── README.md        # This file
+.
+├── core/                  # Custom exceptions
+├── devices/
+│   ├── base/              # BaseDevice, protocols
+│   ├── psu/               # PSU device, strategies, YAML contracts
+│   ├── signal_generator.py
+│   ├── spectrum_analyzer.py
+│   └── oven.py
+├── adapters/              # Transport adapters (ssh/telnet)
+├── examples/              # Small runnable demos
+├── test/                  # Pytest test suite
+├── pyproject.toml         # Editable install metadata
+├── requirements.txt
+└── README.md
 ```
 
 ## Running the example
@@ -25,8 +33,11 @@ signal_lab/
 You can run the example script directly with Python to see how the classes
 operate together:
 
-```bash
-python -m signal_lab.main
+Windows PowerShell:
+
+```
+pip install -e .
+python .\main.py
 ```
 
 This script demonstrates opening both instruments via `with` statements,
@@ -38,8 +49,8 @@ spectrum analyzer, and printing the results.
 The test file is written using `pytest`. If you have pytest installed, you
 can run the tests with:
 
-```bash
-pytest -v signal_lab/test_devices.py
+```
+pytest -q
 ```
 
 If `pytest` is not available, the tests will not run; however, the code is
