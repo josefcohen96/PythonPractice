@@ -68,7 +68,7 @@ class VirtualPsuStrategy(PsuStrategy):
         self._current_limit: float = 0.0
         self._output_on: bool = False
         self._temp_c: float = 25.0
-
+        self._rng = random.Random()  # For noise simulation
     def initialize(self) -> None:
         # Nothing special to do for a virtual PSU
         pass
