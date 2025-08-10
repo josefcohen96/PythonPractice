@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath(
 from core.exceptions import ConnectionError
 from devices.psu.adapters.sim_adapter import SimAdapter
 from devices.psu.yaml_config_loader import YamlPSUConfigLoader
-from devices.psu.strategy import VirtualPsuStrategy
+from devices.psu.strategy import VirtualPsuStrategy, RealPsuStrategy
 from devices.psu.PsuDevice import PSU
 
 
@@ -52,6 +52,46 @@ def test_virtual_psu_flow():
     out = psu.read("output")
 
     # i = psu.read("current")
+
+    # בדיקות בסיסיות: מתח וזרם אי-שליליים, טמפרטורה float/None, מצב יציאה בוליאני
+    assert v >= 0.0
+    # assert i >= 0.0
+    assert isinstance(t, float) or t is None
+    assert i >= 0.0
+    assert isinstance(out, bool)
+
+    psu.disconnect()
+    assert psu.get_state() == "disconnected"
+
+
+def test_real_psu_flow():
+    """
+    וידוא ש-PSU אמיתי מתחבר, מבצע פעולות, ומחזיר ערכים לא שליליים.
+    """
+    loader = YamlPSUConfigLoader()
+    psu = PSU(
+        model="RIGOL-DP832",
+        adapter=SimAdapter(),
+        config_loader=loader,
+        strategy=RealPsuStrategy(),
+    )
+
+    # ניסיון קריאה לפני connect אמור לזרוק ConnectionError
+    with pytest.raises(ConnectionError):
+        psu.read("voltage")
+
+    psu.connect()
+    assert psu.get_state() == "connected"
+
+    # הגדרת מתח, הגבלת זרם והפעלת יציאה
+    psu.set("voltage", 5.0)
+    psu.set("current_limit", 0.2)
+    psu.set("output", True)
+
+    v = psu.read("voltage")
+    t = psu.read("temp")
+    i = psu.read("current")
+    out = psu.read("output")
 
     # בדיקות בסיסיות: מתח וזרם אי-שליליים, טמפרטורה float/None, מצב יציאה בוליאני
     assert v >= 0.0
