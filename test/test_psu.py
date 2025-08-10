@@ -75,7 +75,10 @@ def test_real_psu_flow():
         config_loader=loader,
         strategy=RealPsuStrategy(),
     )
-
+    print("#############################")
+    print("Capabilities:", loader.load_capabilities("KEITHLEY-2230G"))
+    print("Ranges:", loader.load_ranges("KEITHLEY-2230G"))
+    print("#############################") 
     # ניסיון קריאה לפני connect אמור לזרוק ConnectionError
     with pytest.raises(ConnectionError):
         psu.read("voltage")
