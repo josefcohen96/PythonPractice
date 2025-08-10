@@ -1,21 +1,36 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Dict
 from enum import Enum, auto
+from typing import Protocol, Any, Dict
+
 from core.exceptions import ConnectionError
+
+
+class AdapterProtocol(Protocol):
+    def connect(self) -> None: ...
+    def disconnect(self) -> None: ...
+    def is_connected(self) -> bool: ...
+
+
+class ConfigLoaderProtocol(Protocol):
+    def load_capabilities(self, model: str) -> Dict[str, bool]: ...
+    def load_ranges(self, model: str) -> Dict[str, Any]: ...
 
 
 class DeviceState(Enum):
     DISCONNECTED = auto()
+    CONNECTING = auto()
     CONNECTED = auto()
+    DISCONNECTING = auto()
     ERROR = auto()
 
 
 class BaseDevice(ABC):
-    def __init__(self, model: str, adapter: Any, config_loader: Any) -> None:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol) -> None:
         self.model = model
         self.adapter = adapter
         self.config_loader = config_loader
-        self._state = DeviceState.DISCONNECTED
+        self._state: DeviceState = DeviceState.DISCONNECTED
 
     @property
     def state(self) -> DeviceState:
@@ -23,44 +38,46 @@ class BaseDevice(ABC):
 
     @property
     def is_connected(self) -> bool:
-        return self._state is DeviceState.CONNECTED  # return true if connected
+        return self._state is DeviceState.CONNECTED
 
-    @abstractmethod
     def connect(self) -> None:
         if self.is_connected:
             return
+        self._state = DeviceState.CONNECTING
         try:
             self.adapter.connect()
-
             self._state = DeviceState.CONNECTED
-
         except Exception as exc:
-            raise ConnectionError(f" connect error with {exc}")
+            self._state = DeviceState.ERROR
+            raise ConnectionError(f"Connect error: {exc}") from exc
 
-    @abstractmethod
     def disconnect(self) -> None:
-        if not self._state:
+        if self._state is DeviceState.DISCONNECTED:
             return
-
+        self._state = DeviceState.DISCONNECTING
         try:
             self.adapter.disconnect()
             self._state = DeviceState.DISCONNECTED
-
         except Exception as exc:
-            return ConnectionError(f"disconnect with error: {exc}")
+            self._state = DeviceState.ERROR
+            raise ConnectionError(f"Disconnect error: {exc}") from exc
+
+    def require_connected(self) -> None:
+        if not self.is_connected:
+            raise ConnectionError("Device is not connected")
 
     @abstractmethod
     def get_state(self) -> str:
-        pass
+        ...
 
     @abstractmethod
     def get_capabilities(self) -> Dict[str, bool]:
-        pass
+        ...
 
     @abstractmethod
-    def read(self, key: str) -> {}:
-        pass
+    def read(self, key: str) -> None:
+        ...
 
     @abstractmethod
     def set(self, key: str, value: Any) -> Any:
-        pass
+        ...
