@@ -36,8 +36,8 @@ class BaseDevice(ABC):
 
     def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, strategy: Optional[PsuStrategy] = None) -> None:
         self.model = model
-        self.adapter = adapter
-        self.config_loader = config_loader
+        self.adapter: AdapterProtocol = adapter
+        self.config_loader: ConfigLoaderProtocol  = config_loader
         self._state: DeviceState = DeviceState.DISCONNECTED
 
     @property

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
+from unittest import loader
 import pytest
 
 # הוספת ספריית הפרויקט ל-PYTHONPATH כדי שמודול devices יימצא
@@ -22,6 +23,10 @@ def test_virtual_psu_flow():
     וידוא ש-PSU וירטואלי מתחבר, מבצע פעולות, ומחזיר ערכים לא שליליים.
     """
     loader = YamlPSUConfigLoader()
+    print("#############################")
+    print("Capabilities:", loader.load_capabilities("RIGOL-DP832"))
+    print("Ranges:", loader.load_ranges("RIGOL-DP832"))
+    print("#############################")
     psu = PSU(
         model="RIGOL-DP832",
         adapter=SimAdapter(),
