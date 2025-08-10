@@ -1,9 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Protocol
 
-from strategy import PsuStrategy, VirtualPsuStrategy
 from core.exceptions import ConnectionError
 
 
@@ -35,7 +34,7 @@ class BaseDevice(ABC):
       if you do, call super().connect()/disconnect() to preserve state.
     """
 
-    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, strategy: Optional[PsuStrategy] = None) -> None:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol) -> None:
         self.model = model
         self.adapter = adapter
         self.config_loader = config_loader
