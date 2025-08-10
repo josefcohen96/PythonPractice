@@ -1,56 +1,37 @@
 from typing import Dict, Optional, Union
-from ..base import BaseDevice, AdapterProtocol, ConfigLoaderProtocol
+from devices.base import BaseDevice, AdapterProtocol, ConfigLoaderProtocol
 from .strategy import (
     PsuStrategy,
     PSUContext,
     VirtualPsuStrategy,
 )
+from devices.base.BaseDevice import DeviceBehavior, DeviceContext
 
 
-class PSU(BaseDevice):
-    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, strategy: Optional[PsuStrategy] = None) -> None:
+class PsuDeviceBehavior(DeviceBehavior):
+    def __init__(self, strategy: Optional[PsuStrategy] = None) -> None:
+        self._strategy: PsuStrategy = strategy or VirtualPsuStrategy()
+        self._capabilities: Dict[str, bool] = {}
+        self._ranges: Dict[str, Dict[str, Union[float, str]]] = {}
         self._listActions = ["voltage", "current", "temp", "output"]
 
-        if adapter is None:
-            raise ValueError("adapter is required")
-        if not model:
-            raise ValueError("model is required")
-        if config_loader is None:
-            raise ValueError("config loader is required")
-
-        super().__init__(model, adapter, config_loader)
-        self.device_type = "psu"
-
-        self._capabilities = self.config_loader.load_capabilities(self.model)
-        self._ranges = self.config_loader.load_ranges(self.model)
-
-        # Strategy selection: default to Virtual if not provided
-        self._strategy = strategy or VirtualPsuStrategy()
+    def attach(self, ctx: DeviceContext) -> None:
+        self._capabilities = dict(ctx.capabilities)
+        self._ranges = dict(ctx.ranges)
         self._strategy.attach(PSUContext(capabilities=self._capabilities, ranges=self._ranges))
 
-    def connect(self) -> None:
-        super().connect()
-        # Initialize underlying strategy after transport connect
+    def initialize(self) -> None:
         self._strategy.initialize()
-
-    def disconnect(self) -> None:
-        super().disconnect()
-
-    def get_state(self) -> str:
-        return self.state.name.lower()
 
     def get_capabilities(self) -> Dict[str, bool]:
         return self._capabilities
 
     def read(self, key: str) -> Union[float, bool]:
-        self.require_connected()
         if key not in self._listActions:
             raise KeyError(f"unable to read {key}; allowed: {self._listActions}")
         return self._strategy.read(key)
 
     def set(self, key: str, value: object) -> None:
-        self.require_connected()
-        # capability gates
         def _cap(name: str) -> bool:
             return bool(self._capabilities.get(name, False))
 
@@ -75,3 +56,44 @@ class PSU(BaseDevice):
             self._strategy.power_cycle()
             return None
         raise KeyError(f"unknown set key: {key}")
+
+
+class PSU:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, *, strategy: Optional[PsuStrategy] = None) -> None:
+        if adapter is None:
+            raise ValueError("adapter is required")
+        if not model:
+            raise ValueError("model is required")
+        if config_loader is None:
+            raise ValueError("config loader is required")
+
+        behavior = PsuDeviceBehavior(strategy=strategy or VirtualPsuStrategy())
+        self._device = BaseDevice(model, adapter, config_loader, behavior)
+        self.device_type = "psu"
+
+    # Proxy API to underlying BaseDevice
+    @property
+    def state(self) -> str:
+        return self._device.state
+
+    @property
+    def is_connected(self) -> bool:
+        return self._device.is_connected
+
+    def connect(self) -> None:
+        self._device.connect()
+
+    def disconnect(self) -> None:
+        self._device.disconnect()
+
+    def get_state(self) -> str:
+        return self._device.get_state()
+
+    def get_capabilities(self) -> Dict[str, bool]:
+        return self._device.get_capabilities()
+
+    def read(self, key: str) -> Union[float, bool]:
+        return self._device.read(key)
+
+    def set(self, key: str, value: object) -> None:
+        self._device.set(key, value)
