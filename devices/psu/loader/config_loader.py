@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, Union
 
 
 class PSUConfigLoader(ABC):
@@ -28,7 +28,7 @@ class PSUConfigLoader(ABC):
         pass
 
     @abstractmethod
-    def load_ranges(self, model: str) -> Dict[str, Dict[str, float | str]]:
+    def load_ranges(self, model: str) -> Dict[str, Dict[str, Union[float, str]]]:
         """Return a dictionary mapping parameter names to their allowed ranges."""
         pass
 

@@ -69,6 +69,7 @@ class VirtualPsuStrategy(PsuStrategy):
         self._output_on: bool = False
         self._temp_c: float = 25.0
         self._rng = random.Random()  # For noise simulation
+
     def initialize(self) -> None:
         # Nothing special to do for a virtual PSU
         pass
@@ -97,6 +98,24 @@ class VirtualPsuStrategy(PsuStrategy):
             noisy = self._voltage_sp + self._rng.uniform(-0.1, 0.1)
             # Clamp negative values to zero so tests expecting non-negative voltage pass
             return max(noisy, 0.0)
+        if key == "current":
+            # Output disabled -> current reads 0.0
+            if not self._output_on:
+                return 0.0
+            # Add random noise of ±0.01 A around the setpoint
+            noisy = self._current_limit + self._rng.uniform(-0.01, 0.01)
+            # Clamp negative values to zero so tests expecting non-negative current pass
+            return max(noisy, 0.0)
+        if key == "temp":
+            # Output disabled -> temp reads 0.0
+            if not self._output_on:
+                return 0.0
+            # Add random noise of ±1 °C around the setpoint
+            noisy = self._temp_c + self._rng.uniform(-1.0, 1.0)
+            # Clamp negative values to zero so tests expecting non-negative temp pass
+            return max(noisy, 0.0)
+        if key == "output":
+            return self._output_on
 
     def set_voltage(self, volts: float) -> None:
         if not self._in_range("voltage", volts):

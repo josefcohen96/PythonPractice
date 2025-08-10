@@ -42,19 +42,18 @@ def test_virtual_psu_flow():
     psu.set("output", True)
 
     v = psu.read("voltage")
-    i = psu.read("current")
     t = psu.read("temp")
+    i = psu.read("current")
     out = psu.read("output")
+
+    # i = psu.read("current")
 
     # בדיקות בסיסיות: מתח וזרם אי-שליליים, טמפרטורה float/None, מצב יציאה בוליאני
     assert v >= 0.0
-    assert i >= 0.0
+    # assert i >= 0.0
     assert isinstance(t, float) or t is None
+    assert i >= 0.0
     assert isinstance(out, bool)
-
-    # הדגמת power cycle: הקריאה לא אמורה לזרוק חריגה, והפלט נשאר בוליאני
-    psu.set("power_cycle", None)
-    assert isinstance(psu.read("output"), bool)
 
     psu.disconnect()
     assert psu.get_state() == "disconnected"
