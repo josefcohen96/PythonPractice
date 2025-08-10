@@ -1,9 +1,4 @@
 from __future__ import annotations
-from core.exceptions import ConnectionError
-from devices.psu.adapters.sim_adapter import SimAdapter
-from devices.psu.yaml_config_loader import YamlPSUConfigLoader
-from devices.psu.strategy import VirtualPsuStrategy
-from devices.psu.PsuDevice import PSU
 
 import os
 import sys
@@ -12,6 +7,14 @@ import pytest
 # הוספת ספריית הפרויקט ל-PYTHONPATH כדי שמודול devices יימצא
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..")))
+
+
+from core.exceptions import ConnectionError
+from devices.psu.adapters.sim_adapter import SimAdapter
+from devices.psu.yaml_config_loader import YamlPSUConfigLoader
+from devices.psu.strategy import VirtualPsuStrategy
+from devices.psu.PsuDevice import PSU
+
 
 
 def test_virtual_psu_flow():
