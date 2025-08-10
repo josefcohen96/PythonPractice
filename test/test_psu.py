@@ -1,44 +1,57 @@
 from __future__ import annotations
+from ..core.exceptions import ConnectionError
+from devices.psu.adapters.sim_adapter import SimAdapter
+from devices.psu.yaml_config_loader import YamlPSUConfigLoader
+from devices.psu.strategy import VirtualPsuStrategy
+from devices.psu.PsuDevice import PSU
 
+import os
+import sys
 import pytest
 
-from devices.psu.PsuDevice import PSU
-from devices.psu.strategy import VirtualPsuStrategy
-from devices.psu.yaml_config_loader import YamlPSUConfigLoader
-from devices.psu.adapters.sim_adapter import SimAdapter
+# הוספת ספריית הפרויקט ל-PYTHONPATH כדי שמודול devices יימצא
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")))
 
 
-def test_psu_virtual_basic_flow():
+def test_virtual_psu_flow():
+    """
+    וידוא ש-PSU וירטואלי מתחבר, מבצע פעולות, ומחזיר ערכים לא שליליים.
+    """
     loader = YamlPSUConfigLoader()
-    psu = PSU(model="RIGOL-DP832", adapter=SimAdapter(), config_loader=loader, strategy=VirtualPsuStrategy())
+    psu = PSU(
+        model="RIGOL-DP832",
+        adapter=SimAdapter(),
+        config_loader=loader,
+        strategy=VirtualPsuStrategy(),
+    )
+
+    # ניסיון קריאה לפני connect אמור לזרוק ConnectionError
     with pytest.raises(ConnectionError):
         psu.read("voltage")
 
-    # connect the device
     psu.connect()
     assert psu.get_state() == "connected"
 
-    # set voltage, current limit and enable output
+    # הגדרת מתח, הגבלת זרם והפעלת יציאה
     psu.set("voltage", 5.0)
     psu.set("current_limit", 0.2)
     psu.set("output", True)
 
-    # read back simulated measurements
     v = psu.read("voltage")
     i = psu.read("current")
     t = psu.read("temp")
     out = psu.read("output")
 
-    # voltage/current should be non‑negative floats, temp a float or None if unsupported
+    # בדיקות בסיסיות: מתח וזרם אי-שליליים, טמפרטורה float/None, מצב יציאה בוליאני
     assert v >= 0.0
     assert i >= 0.0
     assert isinstance(t, float) or t is None
     assert isinstance(out, bool)
 
-    # perform a power cycle; output remains a boolean afterwards
+    # הדגמת power cycle: הקריאה לא אמורה לזרוק חריגה, והפלט נשאר בוליאני
     psu.set("power_cycle", None)
     assert isinstance(psu.read("output"), bool)
 
-    # disconnect
     psu.disconnect()
     assert psu.get_state() == "disconnected"
