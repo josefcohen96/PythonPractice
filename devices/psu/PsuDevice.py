@@ -8,7 +8,7 @@ from .strategy import (
 
 
 class PSU(BaseDevice):
-    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, *, strategy: Optional[PsuStrategy] = None) -> None:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, strategy: Optional[PsuStrategy] = None) -> None:
         self._listActions = ["voltage", "current", "temp", "output"]
 
         if adapter is None:
