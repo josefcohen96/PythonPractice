@@ -21,6 +21,6 @@ class RangeError(InstrumentError):
     pass
 
 
-class ValueError(InstrumentError):
-    """"""
+class InstrumentValueError(InstrumentError):
+    """Value error specific to instrument configuration/usage."""
     pass

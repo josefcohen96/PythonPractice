@@ -1,12 +1,12 @@
 
-from devices.base import BaseDevice
-from core.exceptions import ValueError
 from typing import Any, Dict
 import os
 import sys
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
+
+from devices.base import BaseDevice, DeviceState
 
 
 class PSU(BaseDevice):
@@ -28,40 +28,27 @@ class PSU(BaseDevice):
             self._capabilities = self.config_loader.load_capabilities(
                 self.model)
             self._ranges = self.config_loader.load_ranges(self.model)
-            self._state = "disconnected"  # initiate state
-
+            # base starts as DISCONNECTED
         finally:
             pass
 
-    def connect(self) -> bool:
-        result = self.adapter.connect()
-        if result == "success":
-            self._state = "connected"
-            return True
-        self._state = "disconnected"
-        return False
+    def connect(self) -> None:
+        super().connect()
 
     def disconnect(self) -> None:
-        result = self.adapter.disconnect()
-
-        if result == "success":
-            self._state = "connected"
-            return True
-
-        self._state = "disconnected"
-        return False
+        super().disconnect()
 
     def get_state(self) -> str:
-        return self._state
+        return self.state.name.lower()
 
     def get_capabilities(self) -> Dict[str, bool]:
         return self._capabilities
 
     def read(self, key: str) -> None:
+        self.require_connected()
         if key not in self._listActions:
             return f"unable to read {key} from {self._listActions}"
-        
-        
 
     def set(self, key: str, value: Any) -> Any:
+        self.require_connected()
         pass
