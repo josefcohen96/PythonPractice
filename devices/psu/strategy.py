@@ -82,22 +82,21 @@ class VirtualPsuStrategy(PsuStrategy):
             return True
 
     def read(self, key: str) -> Union[float, bool]:
+        """
+        Return simulated readings based on the internal state.
+        For voltage, if the output is off the reading is always 0.0.  When the output
+        is on, a small random perturbation is applied to the voltage setpoint.  The
+        result is clamped at 0.0 to avoid returning negative voltages when the
+         simulated noise dips below the setpoint.
+         """
         if key == "voltage":
-            # If output on, assume measured voltage approaches setpoint
-            noise = random.uniform(-0.01, 0.01)
-            return max(0.0, self._voltage_sp + noise) if self._output_on else 0.0
-        if key == "current":
-            # Simple model: small current draw proportional to voltage
-            return self._current_limit if self._output_on and self._current_limit < 0.1 else (
-                0.05 if self._output_on and self._voltage_sp > 0 else 0.0
-            )
-        if key == "temp":
-            # Drift temperature slightly when on
-            self._temp_c += 0.01 if self._output_on else -0.005
-            return max(20.0, min(60.0, self._temp_c))
-        if key == "output":
-            return self._output_on
-        raise KeyError(f"Unknown read key: {key}")
+            # Output disabled -> voltage reads 0.0
+            if not self._output_on:
+                return 0.0
+            # Add random noise of ±0.1 V around the setpoint
+            noisy = self._voltage_sp + self._rng.uniform(-0.1, 0.1)
+            # Clamp negative values to zero so tests expecting non-negative voltage pass
+            return max(noisy, 0.0)
 
     def set_voltage(self, volts: float) -> None:
         if not self._in_range("voltage", volts):
