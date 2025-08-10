@@ -24,3 +24,19 @@ class RangeError(InstrumentError):
 class ValueError(InstrumentError):
     """"""
     pass
+
+class CapabilityMissing(InstrumentError):
+    """"""
+    pass
+
+class DeviceError(InstrumentError):
+    """"""
+    pass
+
+class DeviceTimeout(InstrumentError):
+    """"""
+    pass
+
+class ProtocolError(InstrumentError):
+    """"""
+    pass
