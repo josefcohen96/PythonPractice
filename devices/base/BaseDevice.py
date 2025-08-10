@@ -2,7 +2,6 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, auto
 from typing import Dict, Optional, Protocol
-
 from core.exceptions import ConnectionError
 
 
