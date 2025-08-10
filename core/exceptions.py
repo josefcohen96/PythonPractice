@@ -24,3 +24,19 @@ class RangeError(InstrumentError):
 class InstrumentValueError(InstrumentError):
     """Value error specific to instrument configuration/usage."""
     pass
+
+class CapabilityMissing(InstrumentError):
+    """"""
+    pass
+
+class DeviceError(InstrumentError):
+    """"""
+    pass
+
+class DeviceTimeout(InstrumentError):
+    """"""
+    pass
+
+class ProtocolError(InstrumentError):
+    """"""
+    pass

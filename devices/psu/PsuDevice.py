@@ -1,4 +1,3 @@
-
 from typing import Any, Dict
 import os
 import sys
@@ -10,10 +9,9 @@ from devices.base import BaseDevice, DeviceState
 
 
 class PSU(BaseDevice):
-
     def __init__(self, model: str, adapter: Any, config_loader: Any) -> None:
-
         self._listActions = ["voltage", "current", "temp"]
+
         if adapter is None:
             raise ValueError("adapter is required")
         if not model:
@@ -24,13 +22,8 @@ class PSU(BaseDevice):
         super().__init__(model, adapter, config_loader)
         self.type = "psu"
 
-        try:
-            self._capabilities = self.config_loader.load_capabilities(
-                self.model)
-            self._ranges = self.config_loader.load_ranges(self.model)
-            # base starts as DISCONNECTED
-        finally:
-            pass
+        self._capabilities = self.config_loader.load_capabilities(self.model)
+        self._ranges = self.config_loader.load_ranges(self.model)
 
     def connect(self) -> None:
         super().connect()

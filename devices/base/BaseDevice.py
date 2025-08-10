@@ -7,22 +7,14 @@ from core.exceptions import ConnectionError
 
 
 class AdapterProtocol(Protocol):
-    def connect(self) -> None:
-        ...
-
-    def disconnect(self) -> None:
-        ...
-
-    def is_connected(self) -> bool:
-        ...
+    def connect(self) -> None: ...
+    def disconnect(self) -> None: ...
+    def is_connected(self) -> bool: ...
 
 
 class ConfigLoaderProtocol(Protocol):
-    def load_capabilities(self, model: str) -> Dict[str, bool]:
-        ...
-
-    def load_ranges(self, model: str) -> Dict[str, Any]:
-        ...
+    def load_capabilities(self, model: str) -> Dict[str, bool]: ...
+    def load_ranges(self, model: str) -> Dict[str, Any]: ...
 
 
 class DeviceState(Enum):
@@ -76,16 +68,16 @@ class BaseDevice(ABC):
 
     @abstractmethod
     def get_state(self) -> str:
-        pass
+        ...
 
     @abstractmethod
     def get_capabilities(self) -> Dict[str, bool]:
-        pass
+        ...
 
     @abstractmethod
     def read(self, key: str) -> None:
-        pass
+        ...
 
     @abstractmethod
     def set(self, key: str, value: Any) -> Any:
-        pass
+        ...
