@@ -2,7 +2,8 @@
 
 - devices/
   - base/: Core contracts and base behavior (stateful connect/disconnect)
-  - psu/: PSU device and its adapters
+  - adapters/: Generic transport adapters (Telnet, SSH). Implement `AdapterProtocol`.
+  - psu/: PSU device and its adapters (e.g., SimAdapter)
   - devices.py: Demo instruments (SignalGenerator, SpectrumAnalyzer, Oven)
 - core/
   - exceptions.py: Unified exception types
@@ -15,7 +16,7 @@ Key contracts
 
 Scalability
 - Add new devices by subclassing BaseDevice and using the same adapter/config loader contracts
-- Add new transports by implementing AdapterProtocol (e.g., Telnet, SSH, VISA)
+- Add new transports by implementing AdapterProtocol (e.g., Telnet, SSH, VISA). Prefer `devices/adapters/` for reusable transports.
 - Share adapters across devices when the transport is generic
 - Keep operations device-focused (validation, ranges, SCPI) while BaseDevice manages state
 
