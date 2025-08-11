@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import Dict, Optional, Protocol
 from core.exceptions import ConnectionError
-from core.exceptions import ConnectionError
 
 
 class AdapterProtocol(Protocol):
@@ -34,10 +33,10 @@ class BaseDevice(ABC):
       if you do, call super().connect()/disconnect() to preserve state.
     """
 
-    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol, strategy: Optional[PsuStrategy] = None) -> None:
+    def __init__(self, model: str, adapter: AdapterProtocol, config_loader: ConfigLoaderProtocol) -> None:
         self.model = model
         self.adapter: AdapterProtocol = adapter
-        self.config_loader: ConfigLoaderProtocol  = config_loader
+        self.config_loader: ConfigLoaderProtocol = config_loader
         self._state: DeviceState = DeviceState.DISCONNECTED
 
     @property
@@ -74,6 +73,13 @@ class BaseDevice(ABC):
         if not self.is_connected:
             raise ConnectionError("Device is not connected")
 
+    def __enter__(self):
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+
     @abstractmethod
     def get_state(self) -> str:
         ...
@@ -89,3 +95,7 @@ class BaseDevice(ABC):
     @abstractmethod
     def set(self, key: str, value: object) -> None:
         ...
+
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} model={self.model!r} state={self._state.name}>"
