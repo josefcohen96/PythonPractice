@@ -1,7 +1,11 @@
 from __future__ import annotations
-import telnetlib
 from typing import Optional
 from devices.base import AdapterProtocol
+
+try:  # Python 3.13 may not include telnetlib (PEP 594)
+    import telnetlib  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    telnetlib = None  # type: ignore
 
 
 class TelnetAdapter(AdapterProtocol):
@@ -10,18 +14,23 @@ class TelnetAdapter(AdapterProtocol):
         self.port = port
         self.timeout = timeout
         self.encoding = encoding
-        self._tn: Optional[telnetlib.Telnet] = None
+        self._tn: Optional[object] = None
 
     def connect(self) -> None:
         if self._tn is not None:
             return
+        if telnetlib is None:
+            raise RuntimeError("telnetlib is required for TelnetAdapter")
         self._tn = telnetlib.Telnet(self.host, self.port, timeout=self.timeout)
 
     def disconnect(self) -> None:
         if self._tn is None:
             return
         try:
-            self._tn.close()
+            # Defer attribute access until runtime to avoid hard dependency
+            close = getattr(self._tn, "close", None)
+            if callable(close):
+                close()
         finally:
             self._tn = None
 

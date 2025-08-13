@@ -53,6 +53,10 @@ class BaseDevice(ABC):
         self._state = DeviceState.CONNECTING
         try:
             self.adapter.connect()
+            # Post-connect hook for subclasses
+            on_connect = getattr(self, "_on_connect", None)
+            if callable(on_connect):
+                on_connect()
             self._state = DeviceState.CONNECTED
         except Exception as exc:
             self._state = DeviceState.ERROR
@@ -63,6 +67,10 @@ class BaseDevice(ABC):
             return
         self._state = DeviceState.DISCONNECTING
         try:
+            # Pre-disconnect hook for subclasses
+            on_disconnect = getattr(self, "_on_disconnect", None)
+            if callable(on_disconnect):
+                on_disconnect()
             self.adapter.disconnect()
             self._state = DeviceState.DISCONNECTED
         except Exception as exc:
