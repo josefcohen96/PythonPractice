@@ -17,7 +17,6 @@ class PSU(BaseDevice):
     delegate to the selected strategy.
     """
 
-    # keys allowed for read()
     _ALLOWED_READS: Tuple[str, ...] = ("voltage", "current", "temp", "output")
 
     def __init__(
@@ -37,39 +36,27 @@ class PSU(BaseDevice):
         super().__init__(model, adapter, config_loader)
         self.device_type = "psu"
 
-        # Load policy from YAML
-        self._capabilities: Mapping[str, bool] = self.config_loader.load_capabilities(
-            self.model)
-        self._ranges: Mapping[str, Mapping[str, float]
-                              ] = self.config_loader.load_ranges(self.model)
+        self._capabilities: Mapping[str, bool] = self.config_loader.load_capabilities(self.model)
+        self._ranges: Mapping[str, Mapping[str, float]] = self.config_loader.load_ranges(self.model)
 
-        # Strategy selection: default to Virtual if not provided
         self._strategy: PsuStrategy = strategy or VirtualPsuStrategy()
-        self._strategy.attach(PSUContext(
-            capabilities=self._capabilities, ranges=self._ranges))
+        self._strategy.attach(PSUContext(capabilities=self._capabilities, ranges=self._ranges))
 
-        # Local setpoints (do NOT perform I/O on property get)
         self._voltage_set: float = 0.0
         self._current_limit_set: float = 0.0
         self._output_set: bool = False
 
-    # ----- BaseDevice hooks (Template Method) --------------------------------
     def _on_connect(self) -> None:
-        # Initialize underlying strategy after transport connect
         self._strategy.initialize()
 
-    # ----- Introspection ------------------------------------------------------
     def get_state(self) -> str:
-        # keep string for backward-compat; prefer .state (enum) from BaseDevice
         return self.state.name.lower()
 
     def get_capabilities(self) -> Mapping[str, bool]:
         return self._capabilities
 
-    # ----- Typed properties (preferred API) -----------------------------------
     @property
     def voltage(self) -> float:
-        """Voltage setpoint (no I/O)."""
         return self._voltage_set
 
     @voltage.setter
@@ -86,23 +73,19 @@ class PSU(BaseDevice):
 
     @property
     def current_limit(self) -> float:
-        """Current limit setpoint (no I/O)."""
         return self._current_limit_set
 
     @current_limit.setter
     def current_limit(self, a: float) -> None:
         self.require_connected()
         if not self._capabilities.get("set_current_limit", False):
-            raise PermissionError(
-                "set_current_limit not supported by this model")
+            raise PermissionError("set_current_limit not supported by this model")
         a = float(a)
-        # אם תרצה הגבלת טווחים לזרם, הוסף self._ranges["current_limit"] בדיוק כמו voltage
         self._strategy.set_current_limit(a)
         self._current_limit_set = a
 
     @property
     def output(self) -> bool:
-        """Output enable setpoint (no I/O)."""
         return self._output_set
 
     @output.setter
@@ -114,7 +97,6 @@ class PSU(BaseDevice):
         self._strategy.toggle_output(on)
         self._output_set = on
 
-    # ----- Typed reads (explicit I/O; do not hide I/O in properties) ----------
     def read_voltage(self) -> float:
         self.require_connected()
         return float(self._strategy.read("voltage"))
@@ -128,12 +110,10 @@ class PSU(BaseDevice):
         val = self._strategy.read("temp")
         return None if val is None else float(val)
 
-    # ----- Generic read/set (backwards compatibility) -------------------------
     def read(self, key: str) -> Union[float, bool, None]:
         self.require_connected()
         if key not in self._ALLOWED_READS:
-            raise KeyError(
-                f"unable to read {key}; allowed: {self._ALLOWED_READS}")
+            raise KeyError(f"unable to read {key}; allowed: {self._ALLOWED_READS}")
         if key == "voltage":
             return self.read_voltage()
         if key == "current":
@@ -142,29 +122,22 @@ class PSU(BaseDevice):
             return self.read_temp()
         if key == "output":
             return bool(self._strategy.read("output"))
-        # not reachable due to guard above
         raise KeyError(f"unknown read key: {key}")
 
     def set(self, key: str, value: object) -> None:
-        """
-        Backwards-compatible generic setter. Prefer typed properties:
-        psu.voltage = 5.0; psu.current_limit = 0.2; psu.output = True
-        """
         self.require_connected()
         if key == "voltage":
-            self.voltage = float(value)          # delegate to property
+            self.voltage = float(value)
             return
         if key == "current_limit":
-            self.current_limit = float(value)    # delegate to property
+            self.current_limit = float(value)
             return
         if key == "output":
-            self.output = bool(value)            # delegate to property
+            self.output = bool(value)
             return
         if key == "power_cycle":
             if not self._capabilities.get("power_cycle", False):
-                raise PermissionError(
-                    "power_cycle not supported by this model")
-            # typed op on the strategy
+                raise PermissionError("power_cycle not supported by this model")
             self._strategy.power_cycle()
             return
         raise KeyError(f"unknown set key: {key}")

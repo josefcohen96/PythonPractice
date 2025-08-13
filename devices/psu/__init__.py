@@ -1,9 +1,9 @@
-from .PsuDevice import PSU
-from .strategy import PsuStrategy, VirtualPsuStrategy, RealPsuStrategy
+from .device import PSU
+from .strategies import PsuStrategy, VirtualPsuStrategy, RealPsuStrategy
 
 __all__ = [
-	"PSU",
-	"PsuStrategy",
-	"VirtualPsuStrategy",
-	"RealPsuStrategy",
+    "PSU",
+    "PsuStrategy",
+    "VirtualPsuStrategy",
+    "RealPsuStrategy",
 ]
