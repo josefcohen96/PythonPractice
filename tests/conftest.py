@@ -9,7 +9,7 @@ from core.exceptions import ConnectionError
 from devices.psu.PsuDevice import PSU
 from devices.psu.strategy import VirtualPsuStrategy, RealPsuStrategy
 from devices.psu.yaml_config_loader import YamlPSUConfigLoader
-from devices.psu.adapters import SimAdapter
+from adapters.psu import SimAdapter
 
 
 class DriverProtocol(Protocol):
