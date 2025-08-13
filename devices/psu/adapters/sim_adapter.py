@@ -25,3 +25,8 @@ class SimAdapter(AdapterProtocol):
 
     def is_connected(self) -> bool:
         return self._connected
+
+    # Convenience for tests that check driver.opened
+    @property
+    def opened(self) -> bool:
+        return self._connected
