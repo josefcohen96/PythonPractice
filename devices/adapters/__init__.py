@@ -1,2 +1,0 @@
-from adapters.telnet_adapter import TelnetAdapter
-from adapters.ssh_adapter import SSHAdapter

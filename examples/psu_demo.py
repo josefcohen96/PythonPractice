@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from devices.psu import PSU, VirtualPsuStrategy
 from devices.psu.yaml_config_loader import YamlPSUConfigLoader
-from devices.psu.adapters.sim_adapter import SimAdapter
+from adapters.psu.sim_adapter import SimAdapter
 def main() -> None:
     loader = YamlPSUConfigLoader()  # defaults to the psu module directory
     psu = PSU(model="RIGOL-DP832", adapter=SimAdapter(), config_loader=loader, strategy=VirtualPsuStrategy())

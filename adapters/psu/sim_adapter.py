@@ -9,6 +9,10 @@ class SimAdapter(AdapterProtocol):
         self.connect_delay_s = connect_delay_s
         self.should_fail = should_fail
 
+    @property
+    def opened(self) -> bool:
+        return self._connected
+    
     def connect(self) -> None:
         if self._connected:
             return
@@ -25,3 +29,4 @@ class SimAdapter(AdapterProtocol):
 
     def is_connected(self) -> bool:
         return self._connected
+    
